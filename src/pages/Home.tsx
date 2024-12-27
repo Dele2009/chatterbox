@@ -1,71 +1,127 @@
-// import { FaGift } from "react-icons/fa"; // React Icons
-import { Button } from "flowbite-react"; // Flowbite React components
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Button, TextInput } from "flowbite-react";
+import { FaVideo } from "react-icons/fa";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { AiOutlineLoading } from "react-icons/ai";
 
-const PiNetworkAirdrop = () => {
-  return (
-    <>
-      {/* Header Section */}
+const HomePage = () => {
+  const navigate = useNavigate();
 
-      <div className="w-full max-w-7xl m-auto ">
-        {/* Hero Section */}
-        <main className="m-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Text Content */}
-          <div className="max-w-lg flex flex-col justify-center">
-            <h2 className="text-5xl font-bold leading-tight mb-6">
-              Pi Network first <br /> Airdrop this Season
-            </h2>
-            <p className="text-gray-300 mb-6">
-              The official Pi Network has reached 2 million pioneers! To get
-              closer to the mainnet and activate and attract more pioneers, they
-              will be holding an airdrop, awarding a total of <b>614π</b>
-              /pioneer prizes to those who successfully complete KYC.
-            </p>
-            <p className="text-gray-300">
-              The future looks very exciting as the Pi community continues to
-              build the Web3 Pi ecosystem full of amazing apps and utilities on
-              top of the Pi browser.
-            </p>
-            {/* Button */}
-            <Button
-              as={Link}
-              to="/how-it-works"
-              className="mt-6 !w-fit "
-              color="yellow"
-              size="lg"
-            >
-              {/* <FaGift className="mr-2 h-6" size={16} /> */}
-              <div className="!flex !items-center">
-                <img
-                  // key={index}
-                  src="/box.png"
-                  alt="Box-present"
-                  className={`h-8`}
-                />
-                Participate in Airdrop
-              </div>
-            </Button>
-          </div>
+  const [roomID, setRoomID] = useState("");
+  const [view, setView] = useState("home"); // home | create-room | enter-room | room
+  const [role, setRole] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-          {/* Image */}
-          <div className="flex justify-center relative overflow-hidden">
-            <img
-              src="/hero.png"
-              alt="Santa with Pi Network"
-              className="h-full"
-            />
+  const handleEnterRoom = () => {
+    if (roomID.trim()) {
+      localStorage.setItem("role", "guest");
+      localStorage.setItem("id", "");
+      navigate(`/room/${roomID}`);
+    }
+  };
 
-            <img
-              // key={index}
-              src="/box.png"
-              alt="Box-present"
-              className={`h-72 absolute -bottom-32 right-[50%]`}
-            />
-          </div>
-        </main>
+  const handleCreateRoom = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post(
+        "https://qqx4bjc0-5000.uks1.devtunnels.ms/create-room"
+      );
+      setRoomID(data.roomID);
+      setRole(data.role);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("id", data.userId);
+      setView("create-room-success");
+    } catch (err) {
+      setError(err?.response?.data?.error || "Failed to create room");
+      setView("create-room-error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJoinRoom = () => {
+    setView("enter-room");
+  };
+
+  if (view === "home") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-3xl font-bold mb-4">Welcome</h1>
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+          onClick={handleCreateRoom}
+        >
+          {loading ? (
+            <AiOutlineLoading className="animate-spin" />
+          ) : (
+            "Create Room"
+          )}
+        </button>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleJoinRoom}
+        >
+          Enter Room
+        </button>
       </div>
-    </>
-  );
+    );
+  }
+
+  if (view === "create-room-success") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-xl font-bold mb-4">Room Created</h2>
+        <p className="mb-2">
+          Room ID: <strong>{roomID}</strong>
+        </p>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleEnterRoom}
+        >
+          Enter Room Now
+        </button>
+      </div>
+    );
+  }
+
+  if (view === "create-room-error") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-xl font-bold text-red-500 mb-4">Error</h2>
+        <p>{error}</p>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+          onClick={() => setView("home")}
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  if (view === "enter-room") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-xl font-bold mb-4">Enter Room</h2>
+        <TextInput
+          type="text"
+          placeholder="Room ID"
+          className="border px-4 py-2 rounded mb-4"
+          onChange={(e) => setRoomID(e.target.value)}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleEnterRoom}
+        >
+          Join Room
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 };
 
-export default PiNetworkAirdrop;
+export default HomePage;

@@ -1,22 +1,33 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// Install dependencies for styling and WebRTC
+// npm install tailwindcss react-icons flowbite-react peerjs
 
-import Main from "./layouts/Main";
-import Home from "./pages/Home";
-import HowItWorks from "./pages/HowItWorks";
-import UnlockWallet from "./pages/UnlockWallet";
+import HomePage from './pages/Home'
+import VideoRoomPage from './pages/VideoRoom'
 
-function App() {
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+
+
+
+const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Main/>}>
-          <Route index element={<Home/>} />
-          <Route path="how-it-works" element={<HowItWorks />} />
-          <Route path="unlock-wallet" element={<UnlockWallet />} />
-        </Route>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/room/:roomID" element={<VideoRoomPage />} />
       </Routes>
     </Router>
-  )
-}
+  );
+};
 
-export default App
+
+
+export default App;
+
+// Vite-specific setup:
+// 1. Ensure you have a vite.config.js or vite.config.ts in the root directory.
+// 2. Install necessary plugins if required, like React support:
+//    npm install @vitejs/plugin-react
+// 3. Update scripts in package.json:
+//    "dev": "vite",
+//    "build": "vite build",
+//    "preview": "vite preview"

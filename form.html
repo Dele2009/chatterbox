@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+     <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>HTML forms</title>
+     </head>
+     <body>
+          <form>
+               <fieldset>
+                    <legend>Personal Details</legend>
+
+                    <label>
+                         Enter your name:
+                    </label>
+                    <input type="text" name="username" placeholder="John Doe" required> <br><br>
+
+                    <label>Enter your phone number:</label>
+                    <input type="number" name="user_phone_number" placeholder="+234-000-0000-000" required> <br><br>
+
+                    <label for>
+                         Enter your age:
+                    </label>
+                    <input type="number" name="user_age" placeholder="e.g. 24, 35 ...."> <br><br>
+
+                    <label for>
+                         Enter your email address
+                    </label>
+                    <input type="email" name="user_email" placeholder="johndoe@gmail.com" required> <br><br>
+
+                    <label for>
+                         Country:
+                    </label>
+                    <select name="user_country" required>
+                         <option value>---choose your country----</option>
+
+                         <option value="nigeria">Nigeria</option>
+                         <option value="guinea">Guinea</option>
+                         <option value="togo">Togo</option>
+                         <option value="south_africa">South Africa</option>
+                    </select>
+               </fieldset>
+
+               <fieldset>
+                    <legend>Company Information</legend>
+
+                    <label for>
+                         Company Name:
+                    </label>
+                    <input type="text" name="company_name"> <br><br>
+
+                    <label for>
+                         Registeration Certifcate
+                    </label>
+                    <input type="file" name="company_certificate"> <br><br>
+
+                    <label for="">
+                         Employee Count:
+                    </label> <br>
+                    <input type="radio" name="company_employee_count" value="1-5"> <label>1-5 people</label> <br>
+                    <input type="radio" name="company_employee_count" value="5-10"> <label>5-10 people</label><br>
+                    <input type="radio" name="company_employee_count" value="10+"> <label>10 & more people</label> <br>
+
+                    <label for="">
+                         Company Description
+                    </label><br>
+                    <textarea name="company_description" rows="15" cols="30"></textarea>
+
+
+               </fieldset>
+
+               <button type="submit">
+                    Submit form
+               </button>
+          </form>
+     </body>
+</html>
