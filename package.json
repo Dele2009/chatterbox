@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
+    "build:prod": "vite build && cd dist && type nul > vercel.json && echo {“rewrites”: [{“source”: “/(.*)”,“destination”: “/index.html”}]} > vercel.json",
     "lint": "eslint .",
     "preview": "vite preview"
   },

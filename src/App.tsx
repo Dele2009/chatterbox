@@ -1,25 +1,25 @@
 // Install dependencies for styling and WebRTC
 // npm install tailwindcss react-icons flowbite-react peerjs
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import HomePage from "./pages/Home";
+import VideoRoomPage from "./pages/VideoRoom";
 
-import HomePage from './pages/Home'
-import VideoRoomPage from './pages/VideoRoom'
-
-import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-
-
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/room/:roomID" element={<VideoRoomPage />} />
-      </Routes>
-    </Router>
+    <>
+      <ToastContainer />
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/room/:roomID" element={<VideoRoomPage />} />
+        </Routes>
+      </Router>
+    </>
   );
 };
-
-
 
 export default App;
 
