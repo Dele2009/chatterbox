@@ -8,7 +8,7 @@ import {
   FaVideoSlash,
   FaVideo,
 } from "react-icons/fa";
-import { Button, Modal, TextInput } from "flowbite-react";
+import { Button, Modal, TextInput, Tabs } from "flowbite-react";
 import Peer, { MediaConnection } from "peerjs";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -188,7 +188,7 @@ const VideoRoomPage = () => {
     if (localStream.current) {
       localStream.current.getTracks().forEach((track) => track.stop());
     }
-    socket.current?.emit("leave-room", { roomID});
+    socket.current?.emit("leave-room", { roomID });
     setConnected(false);
     toast.success("Call ended.", { position: "top-center" });
     localStorage.clear();
@@ -255,39 +255,93 @@ const VideoRoomPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <PromptComponent />
-      <h1 className="text-2xl font-bold mb-4">Room: {roomID}</h1>
-      <div className="relative flex-grow w-full flex flex-col">
-        <div className="absolute bottom-4 right-4 w-32 h-32 md:w-44 md:h-44">
-          <div className="relative group w-full h-full">
-            <video
-              ref={localVideo}
-              autoPlay
-              muted
-              className="bg-black border rounded w-full h-full"
-            />
-            <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
-              You
-            </span>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {users.map((user) => (
-            <div key={user.peerID} className="relative group w-full h-full">
-              <video
-                ref={(el) => (videoRefs.current[user.peerID] = el)}
-                autoPlay
-                className="bg-black border rounded w-full h-full"
-              />
-              <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
-                {user.name}
-              </span>
+      <header className="p-4 bg-main_color text-gray-800 text-center">
+        <h1 className="text-3xl font-bold">Room: {roomID}</h1>
+      </header>
+
+      <div className="max-w-6xl h-[80dvh] m-auto w-full">
+      <Tabs aria-label="Room controls" variant="fullWidth">
+        {/* Video Tab */}
+        <Tabs.Item active title="Video" icon={FaVideo} className="relative">
+          <div className="relative w-full h-full flex flex-col items-center">
+            {/* Local Video */}
+            <div className="absolute bottom-4 right-4 w-32 h-32">
+              <div className="relative group w-full h-full z-40">
+                <video
+                  ref={localVideo}
+                  autoPlay
+                  muted
+                  className="bg-black border rounded w-full h-full"
+                />
+                <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
+                  You
+                </span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap justify-center align-center gap-4">
+
+            {/* Other Users' Videos */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-4 w-full h-96 max-h-96 overflow-y-auto">
+              {users.map((user) => (
+                <div key={user.peerID} className="relative group w-full h-full">
+                  <video
+                    ref={(el) => (videoRefs.current[user.peerID] = el)}
+                    autoPlay
+                    className="bg-black border rounded w-full h-full"
+                  />
+                  <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
+                    {user.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Tabs.Item>
+
+        {/* Chat Tab */}
+        <Tabs.Item title="Chat" icon={FaCommentDots}>
+          <div className="w-full h-full flex flex-col items-center p-4">
+            {/* Chat Messages */}
+            <div className="h-64 overflow-y-scroll bg-gray-200 p-4 rounded w-full">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`mb-2 flex ${
+                    msg.sender === peerId ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded ${
+                      msg.sender === peerId
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-300 text-black"
+                    }`}
+                  >
+                    <strong>{msg.name}:</strong> <span>{msg.message}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Send Message Input */}
+            <div className="mt-4 flex items-center gap-2 w-full">
+              <TextInput
+                type="text"
+                className="flex-grow"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              />
+              <Button onClick={sendMessage}>Send</Button>
+            </div>
+          </div>
+        </Tabs.Item>
+      </Tabs>
+    </div>
+
+      {/* Controls */}
+      <footer className="fixed bottom-0 left-0  py-4 px-10 bg-white shadow-md flex flex-wrap justify-center w-full gap-4">
         {isHost ? (
           <>
             <Button color="failure" onClick={handleEndCall}>
@@ -313,8 +367,6 @@ const VideoRoomPage = () => {
             </>
           )}
         </Button>
-
-        {/* Toggle Audio Button */}
         <Button color="info" onClick={toggleAudio}>
           {isAudioMuted ? (
             <>
@@ -326,15 +378,20 @@ const VideoRoomPage = () => {
             </>
           )}
         </Button>
-        <Button color="info" onClick={() => setIsChatOpen(!isChatOpen)}>
+        <Button
+          color="info"
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className="md:hidden"
+        >
           <FaCommentDots className="mr-2 h-6" /> Chat
         </Button>
-      </div>
+      </footer>
 
+      {/* Modal for Chat (Small Screens) */}
       <Modal show={isChatOpen} onClose={() => setIsChatOpen(false)}>
         <Modal.Header>Chat</Modal.Header>
         <Modal.Body>
-          <div className="h-64 overflow-y-scroll bg-gray-200 p-4 rounded">
+          <div className="h-64 overflow-y-auto bg-gray-200 p-4 rounded">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -343,11 +400,11 @@ const VideoRoomPage = () => {
                 }`}
               >
                 <div
-                  className={`mb-2 flex ${
+                  className={`p-2 rounded ${
                     msg.sender === peerId
                       ? "bg-blue-500 text-white"
                       : "bg-gray-300 text-black"
-                  } p-2 rounded`}
+                  }`}
                 >
                   <strong>{msg.name}:</strong> <span>{msg.message}</span>
                 </div>
@@ -357,7 +414,7 @@ const VideoRoomPage = () => {
           <div className="mt-4 flex items-center gap-2">
             <TextInput
               type="text"
-              className="w-full"
+              className="flex-grow"
               placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
