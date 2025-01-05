@@ -7,12 +7,14 @@ import {
   FaMicrophone,
   FaVideoSlash,
   FaVideo,
+  FaCaretUp,
 } from "react-icons/fa";
 import { Button, Modal, TextInput, Tabs } from "flowbite-react";
 import Peer, { MediaConnection } from "peerjs";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { usePrompt } from "../hooks/usePrompt";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 
 interface User {
   peerID: string;
@@ -24,9 +26,12 @@ const VideoRoomPage = () => {
   const navigate = useNavigate();
 
   const { showPrompt, PromptComponent } = usePrompt();
+  const { breakpoint } = useBreakpoint();
   const role = (localStorage.getItem("role") || "guest") as "host" | "guest";
   const userId = localStorage.getItem("id") || "";
   const { roomID } = useParams();
+
+  const [showActionMenu, setActionMenu] = useState<boolean>(breakpoint("lg"));
 
   const [name, setName] = useState<string>("");
   const [peerId, setPeerId] = useState<string>("");
@@ -48,6 +53,8 @@ const VideoRoomPage = () => {
   const peerInstance = useRef<Peer | null>(null);
   const currentCalls = useRef<{ [key: string]: MediaConnection }>({});
   const localStream = useRef<MediaStream | null>(null);
+
+  const toggleActionMenu = () => setActionMenu((prev) => !prev);
 
   useEffect(() => {
     let peer: Peer | null;
@@ -255,136 +262,155 @@ const VideoRoomPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <PromptComponent />
       <header className="p-4 bg-main_color text-gray-800 text-center">
         <h1 className="text-3xl font-bold">Room: {roomID}</h1>
       </header>
 
-      <div className="max-w-6xl h-[80dvh] m-auto w-full">
-      <Tabs aria-label="Room controls" variant="fullWidth">
-        {/* Video Tab */}
-        <Tabs.Item active title="Video" icon={FaVideo} className="relative">
-          <div className="relative w-full h-full flex flex-col items-center">
-            {/* Local Video */}
-            <div className="absolute bottom-4 right-4 w-32 h-32">
-              <div className="relative group w-full h-full z-40">
-                <video
-                  ref={localVideo}
-                  autoPlay
-                  muted
-                  className="bg-black border rounded w-full h-full"
-                />
-                <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
-                  You
-                </span>
-              </div>
-            </div>
-
-            {/* Other Users' Videos */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-4 w-full h-96 max-h-96 overflow-y-auto">
-              {users.map((user) => (
-                <div key={user.peerID} className="relative group w-full h-full">
+      <div className="max-w-6xl h-screen m-auto w-full">
+        <Tabs
+          aria-label="Room controls"
+          variant="fullWidth"
+        >
+          {/* Video Tab */}
+          <Tabs.Item active title="Video" icon={FaVideo}>
+            <div className="relative w-full h-full flex flex-col items-center">
+              {/* Local Video */}
+              <div className="absolute bottom-2 right-2 w-32 h-32">
+                <div className="relative group w-full h-full z-40">
                   <video
-                    ref={(el) => (videoRefs.current[user.peerID] = el)}
+                    ref={localVideo}
                     autoPlay
+                    muted
                     className="bg-black border rounded w-full h-full"
                   />
                   <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
-                    {user.name}
+                    You
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </Tabs.Item>
+              </div>
 
-        {/* Chat Tab */}
-        <Tabs.Item title="Chat" icon={FaCommentDots}>
-          <div className="w-full h-full flex flex-col items-center p-4">
-            {/* Chat Messages */}
-            <div className="h-64 overflow-y-scroll bg-gray-200 p-4 rounded w-full">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`mb-2 flex ${
-                    msg.sender === peerId ? "justify-end" : "justify-start"
-                  }`}
-                >
+              {/* Other Users' Videos */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-4 w-full h-[450px] max-h-[450px]  overflow-y-auto">
+                {users.map((user) => (
                   <div
-                    className={`p-2 rounded ${
-                      msg.sender === peerId
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-300 text-black"
+                    key={user.peerID}
+                    className="relative group w-full h-full"
+                  >
+                    <video
+                      ref={(el) => (videoRefs.current[user.peerID] = el)}
+                      autoPlay
+                      className="bg-black border rounded w-full h-full"
+                    />
+                    <span className="absolute bottom-3 left-3 font-semibold text-white bg-black rounded p-2">
+                      {user.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Tabs.Item>
+
+          {/* Chat Tab */}
+          <Tabs.Item title="Chat" icon={FaCommentDots}>
+            <div className="w-full h-full flex flex-col items-center p-4">
+              {/* Chat Messages */}
+              <div className="h-[400px] max-h-[400px] overflow-y-auto bg-gray-200 p-4 rounded w-full">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`mb-2 flex ${
+                      msg.sender === peerId ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <strong>{msg.name}:</strong> <span>{msg.message}</span>
+                    <div
+                      className={`p-2 rounded ${
+                        msg.sender === peerId
+                          ? "bg-gradient-to-r from-green-400 to-blue-500 text-white"
+                          : "bg-gray-300 text-black"
+                      } flex flex-col gap-1`}
+                    >
+                      <strong className="text-xs">{msg.name}</strong>
+                      <span>{msg.message}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Send Message Input */}
-            <div className="mt-4 flex items-center gap-2 w-full">
-              <TextInput
-                type="text"
-                className="flex-grow"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <Button onClick={sendMessage}>Send</Button>
+              {/* Send Message Input */}
+              <div className="mt-4 flex items-center gap-2 w-full">
+                <TextInput
+                  type="text"
+                  className="flex-grow"
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                />
+                <Button onClick={sendMessage}>Send</Button>
+              </div>
             </div>
-          </div>
-        </Tabs.Item>
-      </Tabs>
-    </div>
+          </Tabs.Item>
+        </Tabs>
+      </div>
 
       {/* Controls */}
-      <footer className="fixed bottom-0 left-0  py-4 px-10 bg-white shadow-md flex flex-wrap justify-center w-full gap-4">
-        {isHost ? (
-          <>
-            <Button color="failure" onClick={handleEndCall}>
-              <FaPhoneSlash className="mr-2 h-6" /> End Call
-            </Button>
-            <Button color="dark" onClick={handleMuteAll}>
-              <FaMicrophoneSlash className="mr-2 h-6" /> Mute All
-            </Button>
-          </>
-        ) : (
-          <Button color="gray" onClick={handleEndCall}>
-            <FaPhoneSlash className="mr-2 h-6" /> Leave Room
-          </Button>
-        )}
-        <Button color="info" onClick={toggleVideo}>
-          {isVideoBlocked ? (
-            <>
-              <FaVideoSlash className="mr-2 h-6" /> Enable Video
-            </>
-          ) : (
-            <>
-              <FaVideo className="mr-2 h-6" /> Disable Video
-            </>
-          )}
-        </Button>
-        <Button color="info" onClick={toggleAudio}>
-          {isAudioMuted ? (
-            <>
-              <FaMicrophoneSlash className="mr-2 h-6" /> Unmute
-            </>
-          ) : (
-            <>
-              <FaMicrophone className="mr-2 h-6" /> Mute
-            </>
-          )}
-        </Button>
-        <Button
-          color="info"
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          className="md:hidden"
+      <footer className="fixed bottom-0 left-0 right-0">
+        <div
+          className={`relative z-50 ${
+            showActionMenu ? "translate-y-0" : "translate-y-20"
+          } transition-transform duration-700  py-4 px-10 bg-white shadow-md flex flex-wrap justify-center w-full gap-4`}
         >
-          <FaCommentDots className="mr-2 h-6" /> Chat
-        </Button>
+          <div
+            onClick={toggleActionMenu}
+            className="absolute z-10 -top-12 left-[90%] cursor-pointer rounded-tl rounded-tr bg-white shadow-md p-3 "
+          >
+            <FaCaretUp size={30} />
+          </div>
+          {isHost ? (
+            <>
+              <Button color="failure" onClick={handleEndCall}>
+                <FaPhoneSlash className="mr-2 h-6" /> End Call
+              </Button>
+              <Button color="dark" onClick={handleMuteAll}>
+                <FaMicrophoneSlash className="mr-2 h-6" /> Mute All
+              </Button>
+            </>
+          ) : (
+            <Button color="gray" onClick={handleEndCall}>
+              <FaPhoneSlash className="mr-2 h-6" /> Leave Room
+            </Button>
+          )}
+          <Button color="info" onClick={toggleVideo}>
+            {isVideoBlocked ? (
+              <>
+                <FaVideoSlash className="mr-2 h-6" /> Enable Video
+              </>
+            ) : (
+              <>
+                <FaVideo className="mr-2 h-6" /> Disable Video
+              </>
+            )}
+          </Button>
+          <Button color="info" onClick={toggleAudio}>
+            {isAudioMuted ? (
+              <>
+                <FaMicrophoneSlash className="mr-2 h-6" /> Unmute
+              </>
+            ) : (
+              <>
+                <FaMicrophone className="mr-2 h-6" /> Mute
+              </>
+            )}
+          </Button>
+          <Button
+            color="info"
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            className="md:hidden"
+          >
+            <FaCommentDots className="mr-2 h-6" /> Chat
+          </Button>
+        </div>
       </footer>
 
       {/* Modal for Chat (Small Screens) */}

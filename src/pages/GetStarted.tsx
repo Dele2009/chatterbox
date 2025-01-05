@@ -87,23 +87,23 @@ const GetStarted = () => {
         <h2 className="text-3xl font-bold text-gray-800 mb-4">
           Why Choose ChatterBox?
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded shadow-md">
-            <FaUsers className="text-4xl text-blue-500 mb-4" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 p-7">
+          <div className="bg-white p-6 rounded shadow-md relative">
+            <FaUsers className="text-2xl text-blue-500 mb-4 absolute -top-3 -left-3" />
             <h3 className="text-xl font-semibold">Collaborate</h3>
             <p className="text-gray-600">
               Work together with teams and friends seamlessly.
             </p>
           </div>
-          <div className="bg-white p-6 rounded shadow-md">
-            <FaComments className="text-4xl text-green-500 mb-4" />
+          <div className="bg-white p-6 rounded shadow-md relative">
+            <FaComments className="text-2xl text-green-500 mb-4 absolute -top-3 -left-3" />
             <h3 className="text-xl font-semibold">Chat Effortlessly</h3>
             <p className="text-gray-600">
               Enjoy smooth, high-quality audio and video conversations.
             </p>
           </div>
-          <div className="bg-white p-6 rounded shadow-md">
-            <FaInfoCircle className="text-4xl text-yellow-500 mb-4" />
+          <div className="bg-white p-6 rounded shadow-md relative">
+            <FaInfoCircle className="text-2xl text-yellow-500 mb-4 absolute -top-3 -left-3" />
             <h3 className="text-xl font-semibold">Easy to Use</h3>
             <p className="text-gray-600">
               Get started in minutes with an intuitive and user-friendly design.
@@ -160,23 +160,25 @@ const GetStarted = () => {
   );
 
   const renderEnterRoom = () => (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <MdOutlineRoom /> Enter Room
-      </h2>
-      <TextInput
-        type="text"
-        placeholder="Enter Room ID"
-        className="mb-4 w-64"
-        onChange={(e) => setRoomID(e.target.value)}
-      />
-      <Button
-        color="blue"
-        onClick={handleEnterRoom}
-        className="w-64 flex items-center justify-center gap-2"
-      >
-        <MdOutlineRoom className="h-6 mr-2" /> Join Room
-      </Button>
+    <div className="flex flex-col items-center justify-center min-h-screen ">
+      <div className="flex flex-col items-center m-auto max-w-lg w-full justify-center bg-gray-50 p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <MdOutlineRoom /> Enter Room
+        </h2>
+        <TextInput
+          type="text"
+          placeholder="Enter Room ID"
+          className="mb-4 w-full"
+          onChange={(e) => setRoomID(e.target.value)}
+        />
+        <Button
+          color="blue"
+          onClick={handleEnterRoom}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <MdOutlineRoom className="h-6 mr-2" /> Join Room
+        </Button>
+      </div>
     </div>
   );
 
